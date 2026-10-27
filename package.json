@@ -1,6 +1,6 @@
 {
   "name": "dsh-piliang",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Host plugin: register multi_edit for ordered all-or-nothing literal edits of one already-read UTF-8 file.",
   "type": "module",

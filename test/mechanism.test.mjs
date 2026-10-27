@@ -303,6 +303,30 @@ test("missing file after read: same FS_STALE_VERSION as edit", async (t) => {
   assert.match(textOf(multi), /changed since it was read/);
 });
 
+test("preview read failure with multiple edits does not publish edits[0]", async (t) => {
+  const h = await createHarness(t);
+  const path = join(h.dir, "gone-multi-items.txt");
+  await writeFile(path, "hello\nworld\n");
+  await observe(h, path);
+  await rm(path);
+  h.editTextCalls.length = 0;
+  const first = { old_string: "hello", new_string: "HELLO" };
+  const multi = await runTool(h, "multi_edit", {
+    file_path: path,
+    edits: [
+      first,
+      { old_string: "world", new_string: "WORLD" },
+    ],
+  });
+  assert.equal(multi.isError, true);
+  assert.equal(
+    h.editTextCalls.some((call) => call.oldString === first.old_string && call.newString === first.new_string),
+    false,
+    "editText must not be called with only edits[0] when the preview read fails for a multi-item batch",
+  );
+  await assert.rejects(() => readFile(path), { code: "ENOENT" });
+});
+
 test("external modify after read: same FS_STALE_VERSION as edit", async (t) => {
   const h = await createHarness(t);
   const seqPath = join(h.dir, "stale-seq.txt");

@@ -4,7 +4,7 @@
   <p><strong>同文件多处字面替换一次完成；任一项失败则整批不写盘。</strong></p>
   <p>面向 DeepSeek Harness Desktop 的纯 Host 文件系统插件，注册工具 <code>multi_edit</code>。</p>
   <p><strong>简体中文</strong> · <a href="README.en.md">English</a></p>
-  <p><a href="package.json">插件 0.1.0</a> · 纯 Host / ESM · 无 Client、无 UI</p>
+  <p><a href="package.json">插件 0.1.1</a> · 纯 Host / ESM · 无 Client、无 UI</p>
   <p><a href="#核心能力">核心能力</a> · <a href="#工作方式">工作方式</a> · <a href="#快速开始">快速开始</a> · <a href="#配置">配置</a> · <a href="#验证">验证</a> · <a href="#常见问题">常见问题</a></p>
 </div>
 
@@ -86,7 +86,7 @@ git clone https://github.com/yueyexiayu/dsh-piliang.git "$DSH_HOME/plugins/dsh-p
 
 在已验证的 Desktop `0.2.1-alpha.4.20261020.1` 上：
 
-- `ELECTRON_RUN_AS_NODE=1` 跑 `test/*.test.mjs`：15 项通过（CRLF 字节与逐次 `edit` 相同、后项依赖前项、`replace_all`、项失败不写盘、不唯一、未读/过期/沙箱与 `edit` 同码、空文件、与 gongjuyasuo/bingxing 共存）。
+- `ELECTRON_RUN_AS_NODE=1` 跑 `test/*.test.mjs`：16 项通过（CRLF 字节与逐次 `edit` 相同、后项依赖前项、`replace_all`、项失败不写盘、不唯一、未读/过期/沙箱与 `edit` 同码、空文件、预览读失败且多项时不把 `edits[0]` 单独写盘、与 gongjuyasuo/bingxing 共存）。
 - Desktop ⌘Q 后工具表出现 `multi_edit` 且 `edit` 仍在。去掉 insert 后目录中 `multi_edit` 消失、`edit` 仍在。
 
 未在 Windows/Linux 或其他 Desktop 版本上验证。没有 GitHub Actions；不要把上述本机结果当成实时 CI。
