@@ -1,0 +1,21 @@
+# Public source allowlist. Local Desktop evidence and session notes stay local.
+/*
+!/.gitignore
+!/README.md
+!/README.en.md
+!/package.json
+!/cordis.patch.yml
+!/lib/
+/lib/*
+!/lib/index.js
+!/test/
+/test/*
+!/test/mechanism.test.mjs
+!/test/scheduler.mjs
+!/docs/
+/docs/*
+!/docs/assets/
+/docs/assets/*
+!/docs/assets/hero.svg
+!/docs/assets/workflow.zh-CN.svg
+!/docs/assets/workflow.en.svg

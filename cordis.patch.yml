@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-piliang
+      name: ./lib/index.js

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720" viewBox="0 0 600 720" role="img" aria-labelledby="title desc">
+<title id="title">multi_edit all-or-nothing flow</title>
+<desc id="desc">The plugin applies every literal replacement in memory. If any item fails it never calls editText. On success it publishes once with a whole-file replace. Schematic, not a screenshot.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="m0 0 7 4-7 4" fill="none" stroke="#6a8990" stroke-width="1.5"/></marker></defs>
+<rect width="600" height="720" rx="22" fill="#f4f8f8"/>
+<g font-family="sans-serif">
+<text x="40" y="52" font-size="28" font-weight="700" fill="#173a40">Write once, or not at all</text>
+<text x="40" y="86" font-size="18" fill="#4d6b72">Schematic · not per-item writes</text>
+<g fill="white" stroke="#c5ddd8">
+<rect x="40" y="120" width="520" height="96" rx="16"/>
+<rect x="40" y="250" width="520" height="96" rx="16"/>
+<rect x="40" y="380" width="520" height="96" rx="16"/>
+<rect x="40" y="510" width="520" height="96" rx="16"/>
+</g>
+<g fill="#1c6d60" font-size="22" font-weight="700"><text x="60" y="158">01</text><text x="60" y="288">02</text><text x="60" y="418">03</text><text x="60" y="548">04</text></g>
+<g fill="#183c42" font-size="22" font-weight="600">
+<text x="104" y="158">Parse args and observation guards</text>
+<text x="104" y="288">Apply items in order on LF text</text>
+<text x="104" y="418">Any failure throws</text>
+<text x="104" y="548">One editText on full success</text>
+</g>
+<g fill="#516e73" font-size="18">
+<text x="104" y="190">Same FS codes as a single edit</text>
+<text x="104" y="320">Later items see earlier ones; no disk write</text>
+<text x="104" y="450">Errors name the 1-based item; bytes unchanged</text>
+<text x="104" y="580">Whole-file oldString to final; endings restored by core</text>
+</g>
+<g stroke="#6a8990" stroke-width="2" marker-end="url(#arrow)">
+<path d="M300 220v23"/><path d="M300 350v23"/><path d="M300 480v23"/>
+</g>
+</g>
+</svg>

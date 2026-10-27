@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720" viewBox="0 0 600 720" role="img" aria-labelledby="title desc">
+<title id="title">multi_edit 全成或全不成流程示意</title>
+<desc id="desc">插件在内存中按序应用全部字面替换；任一项失败则不调用 editText。全部成功后一次全文发布。示意，不是实际界面。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="m0 0 7 4-7 4" fill="none" stroke="#6a8990" stroke-width="1.5"/></marker></defs>
+<rect width="600" height="720" rx="22" fill="#f4f8f8"/>
+<g font-family="sans-serif">
+<text x="40" y="52" font-size="28" font-weight="700" fill="#173a40">一批全成才落盘</text>
+<text x="40" y="86" font-size="18" fill="#4d6b72">流程示意 · 不是逐项写盘</text>
+<g fill="white" stroke="#c5ddd8">
+<rect x="40" y="120" width="520" height="96" rx="16"/>
+<rect x="40" y="250" width="520" height="96" rx="16"/>
+<rect x="40" y="380" width="520" height="96" rx="16"/>
+<rect x="40" y="510" width="520" height="96" rx="16"/>
+</g>
+<g fill="#1c6d60" font-size="22" font-weight="700"><text x="60" y="158">01</text><text x="60" y="288">02</text><text x="60" y="418">03</text><text x="60" y="548">04</text></g>
+<g fill="#183c42" font-size="22" font-weight="600">
+<text x="104" y="158">解析参数与观察守卫</text>
+<text x="104" y="288">在 LF 底本上按序替换</text>
+<text x="104" y="418">任一项失败则抛错</text>
+<text x="104" y="548">全部成功后一次 editText</text>
+</g>
+<g fill="#516e73" font-size="18">
+<text x="104" y="190">沙箱、未读、过期与单独 edit 同码</text>
+<text x="104" y="320">后项看见前项；不写磁盘</text>
+<text x="104" y="450">错误含 1-based 项号；文件字节不变</text>
+<text x="104" y="580">全文 oldString → 终稿；换行由官方恢复</text>
+</g>
+<g stroke="#6a8990" stroke-width="2" marker-end="url(#arrow)">
+<path d="M300 220v23"/><path d="M300 350v23"/><path d="M300 480v23"/>
+</g>
+</g>
+</svg>
