@@ -4,7 +4,7 @@
   <p><strong>同文件多处字面替换一次完成；任一项失败则整批不写盘。</strong></p>
   <p>面向 DeepSeek Harness Desktop 的纯 Host 文件系统插件，注册工具 <code>multi_edit</code>。</p>
   <p><strong>简体中文</strong> · <a href="README.en.md">English</a></p>
-  <p><a href="package.json">插件 0.1.1</a> · 纯 Host / ESM · 无 Client、无 UI</p>
+  <p><a href="package.json">插件 0.1.2</a> · 纯 Host / ESM · 无 Client、无 UI</p>
   <p><a href="#核心能力">核心能力</a> · <a href="#工作方式">工作方式</a> · <a href="#快速开始">快速开始</a> · <a href="#配置">配置</a> · <a href="#验证">验证</a> · <a href="#常见问题">常见问题</a></p>
 </div>
 
