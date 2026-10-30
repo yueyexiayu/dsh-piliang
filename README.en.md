@@ -4,7 +4,7 @@
   <p><strong>Several literal edits in one file, one call; if any item fails, nothing is written.</strong></p>
   <p>A filesystem Host plugin for DeepSeek Harness Desktop that registers <code>multi_edit</code>.</p>
   <p><a href="README.md">简体中文</a> · <strong>English</strong></p>
-  <p><a href="package.json">plugin 0.1.2</a> · Host-only ESM · no Client, no UI</p>
+  <p><a href="package.json">plugin 0.1.3</a> · Host-only ESM · no Client, no UI</p>
   <p><a href="#features">Features</a> · <a href="#how-it-works">How it works</a> · <a href="#quick-start">Quick start</a> · <a href="#configuration">Configuration</a> · <a href="#validation">Validation</a> · <a href="#faq">FAQ</a></p>
 </div>
 
@@ -78,7 +78,7 @@ No config file and no custom HTTP routes. Injects `loader`, `tools`, `fs`, and `
 
 On item failure the file is unchanged and the error names `item N`. Fix that `old_string` or set `replace_all`, then resubmit the batch. Independent spans can use `edit` instead.
 
-It can load beside `dsh-gongjuyasuo` and `dsh-bingxing`. Short success text does not need spilling. The stock `edit` tool is unchanged.
+It can load beside `dsh-bingxing`. The stock `edit` tool is unchanged.
 
 </details>
 
@@ -86,7 +86,7 @@ It can load beside `dsh-gongjuyasuo` and `dsh-bingxing`. Short success text does
 
 On the verified Desktop `0.2.1-alpha.4.20261020.1`:
 
-- `ELECTRON_RUN_AS_NODE=1` `test/*.test.mjs`: 16 passing tests (CRLF bytes match sequential `edit`, later items see earlier ones, `replace_all`, item failure leaves the file, ambiguous match, unread/stale/sandbox same codes as `edit`, empty file, preview-read failure with multiple items does not publish `edits[0]` alone, coexistence with gongjuyasuo/bingxing).
+- `ELECTRON_RUN_AS_NODE=1` `test/*.test.mjs` checks CRLF bytes against sequential `edit`, dependent items, `replace_all`, failures without writes, ambiguity, unread/stale/sandbox errors, empty files, and coexistence with bingxing.
 - After Desktop ⌘Q, the catalog includes `multi_edit` and still includes `edit`. After removing the insert, `multi_edit` disappears and `edit` remains.
 
 Not verified on Windows/Linux or other Desktop versions. No GitHub Actions; do not treat the local results as live CI.

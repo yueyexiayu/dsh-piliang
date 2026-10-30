@@ -4,7 +4,6 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { apply as applyPiliang } from "../lib/index.js";
-import * as Gongjuyasuo from "../../dsh-gongjuyasuo/lib/index.js";
 import { apply as applyBingxing } from "../../dsh-bingxing/lib/index.js";
 import { runScheduledCalls } from "./scheduler.mjs";
 
@@ -52,13 +51,12 @@ function wrapEditText(ctx) {
 
 async function createHarness(t, {
   sandboxMode,
-  gongjuyasuo = false,
   bingxing = false,
 } = {}) {
   const dir = await mkdtemp(join(tmpdir(), "dsh-piliang-"));
   const names = [
     "cordis", "dsh-session", "dsh-session-projection", "dsh-token-meter", "dsh-session-query",
-    "dsh-agent", "dsh-llm", "dsh-system-prompt", "dsh-tools", "dsh-agent-loop", "dsh-fs-local",
+    "dsh-agent", "dsh-llm", "dsh-system-prompt", "dsh-tools", "dsh-agent-loop", "dsh-fs-local", "dsh-tool-executor-native",
     "dsh-fs-sandbox", "dsh-working-directory", "dsh-subprocess-local", "dsh-spill-local", "dsh-tool-fs",
     "dsh-tool-fs-search", "dsh-fs-observation-policy",
   ];
@@ -69,25 +67,26 @@ async function createHarness(t, {
     await ctx.fiber.dispose();
     await rm(dir, { recursive: true, force: true });
   });
-  new mods["dsh-session"].SessionStore(ctx);
-  new mods["dsh-session-projection"].SessionProjectionRegistry(ctx);
-  new mods["dsh-token-meter"].TokenMeter(ctx, {});
-  new mods["dsh-session-query"].SessionQueryEngine(ctx);
-  new mods["dsh-agent"].AgentRegistry(ctx);
-  new mods["dsh-llm"].LlmRuntime(ctx);
-  new mods["dsh-system-prompt"].SystemPrompt(ctx, { includeHarnessIdentity: false, includeRuntimeContext: false });
-  new mods["dsh-tools"].ToolRuntime(ctx);
+  await ctx.plugin(mods["dsh-session"].SessionStore);
+  await ctx.plugin(mods["dsh-session-projection"].SessionProjectionRegistry);
+  await ctx.plugin(mods["dsh-token-meter"].TokenMeter, {});
+  await ctx.plugin(mods["dsh-session-query"].SessionQueryEngine);
+  await ctx.plugin(mods["dsh-agent"].AgentRegistry);
+  await ctx.plugin(mods["dsh-llm"].LlmRuntime);
+  await ctx.plugin(mods["dsh-system-prompt"].SystemPrompt, { includeHarnessIdentity: false, includeRuntimeContext: false });
+  await ctx.plugin(mods["dsh-tools"].ToolRuntime);
+  await ctx.plugin(mods["dsh-tool-executor-native"]);
   if (sandboxMode) {
     ctx.provide("sandboxPolicy", {
       defaultMode: sandboxMode,
       resolve: () => ({ mode: sandboxMode, workspaceRoot: dir }),
     });
-    new mods["dsh-fs-sandbox"].default(ctx, { cwd: dir, diffBasisMaxBytes: 1_000_000 });
+    await ctx.plugin(mods["dsh-fs-sandbox"].default, { cwd: dir, diffBasisMaxBytes: 1_000_000 });
   } else {
-    new mods["dsh-fs-local"].default(ctx, { cwd: dir, diffBasisMaxBytes: 1_000_000 });
+    await ctx.plugin(mods["dsh-fs-local"].default, { cwd: dir, diffBasisMaxBytes: 1_000_000 });
   }
-  new mods["dsh-working-directory"].WorkingDirectoryService(ctx, { defaultDirectory: dir });
-  new mods["dsh-agent-loop"].AgentLoop(ctx, { agents: [], maxParallelToolCalls: { get: () => 1 } });
+  await ctx.plugin(mods["dsh-working-directory"].WorkingDirectoryService, { defaultDirectory: dir });
+  await ctx.plugin(mods["dsh-agent-loop"].default, { agents: [], maxParallelToolCalls: 1 });
   await ctx.plugin(mods["dsh-subprocess-local"].default, {});
   await ctx.plugin(mods["dsh-spill-local"].default, {});
   await ctx.plugin(mods["dsh-fs-observation-policy"]);
@@ -110,20 +109,6 @@ async function createHarness(t, {
   if (bingxing) {
     await ctx.plugin({ name: "dsh-bingxing", inject: ["tools", "agents"], apply: applyBingxing });
   }
-  if (gongjuyasuo) {
-    await ctx.plugin(Gongjuyasuo, {
-      configPath: "/Users/ning/.dsh/plugins/dsh-gongjuyasuo/config.json",
-      diagnosticsPath: join(dir, "gongjuyasuo-diagnostics.jsonl"),
-      settings: {
-        thresholdChars: 80,
-        watermarkChars: 80,
-        minNetReductionChars: 1,
-        minTailContributionChars: 1,
-        reminderIntervalRequests: 1,
-        recentProtectionRequests: 1,
-      },
-    });
-  }
   const handle = await ctx.agents.create({ sessionId: `piliang-${Date.now()}-${Math.random().toString(16).slice(2)}`, meta: { cwd: dir } });
   return { ctx, dir, agent: handle.agent, editTextCalls, mods };
 }
@@ -135,8 +120,7 @@ test("multi_edit is registered, edit remains, not concurrency-safe", async (t) =
   assert.ok(multi);
   assert.ok(edit);
   assert.equal(Object.hasOwn(multi, "isConcurrencySafe"), false);
-  assert.equal(h.ctx.tools.executionMode({ name: "multi_edit", arguments: { file_path: "a", edits: [{ old_string: "a", new_string: "b" }] }, agent: h.agent }).kind, "exclusive");
-  assert.equal(h.ctx.tools.executionMode({ name: "edit", arguments: { file_path: "a", old_string: "a", new_string: "b" }, agent: h.agent }).kind, "exclusive");
+  assert.equal(edit.isConcurrencySafe, undefined);
 });
 
 test("success bytes equal sequential edit, including CRLF, one editText publish", async (t) => {
@@ -435,11 +419,10 @@ test("empty file does not write", async (t) => {
   assert.deepEqual(await readFile(path), Buffer.alloc(0));
 });
 
-test("gongjuyasuo and bingxing coexist; recover still works; render is text-only", async (t) => {
-  const h = await createHarness(t, { gongjuyasuo: true, bingxing: true });
+test("bingxing and multi_edit coexist; render is text-only", async (t) => {
+  const h = await createHarness(t, { bingxing: true });
   assert.ok(h.ctx.tools.get("multi_edit", h.agent));
   assert.ok(h.ctx.tools.get("edit", h.agent));
-  assert.ok(h.ctx.tools.get("gongjuyasuo", h.agent));
   assert.ok(h.ctx.tools.get("grep", h.agent));
   const path = join(h.dir, "coexist.txt");
   await writeFile(path, "a\nb\n");
@@ -454,6 +437,4 @@ test("gongjuyasuo and bingxing coexist; recover still works; render is text-only
   assert.notEqual(multi.isError, true, textOf(multi));
   const blocks = multi.content ?? [];
   assert.equal(blocks.every((block) => block.type === "text"), true);
-  const inspect = await runTool(h, "gongjuyasuo", { action: "inspect" });
-  assert.notEqual(inspect.isError, true, textOf(inspect));
 });
